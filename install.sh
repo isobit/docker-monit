@@ -27,8 +27,8 @@ else
 fi
 
 if [[ -d /etc/monit.d ]]; then
-	echo "Installing /etc/monit.d/docker-pidwatch.monitrc"
-	cp docker-pidwatch.monitrc /etc/monit.d/
+	echo "Installing /etc/monit.d/docker-pidwatch"
+	cp docker-pidwatch.monitrc /etc/monit.d/docker-pidwatch
 	monit reload
 else
 	echo "WARNING: Directory /etc/monit.d does not exist, monitoring will not be installed"
