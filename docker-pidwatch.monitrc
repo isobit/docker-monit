@@ -1,0 +1,4 @@
+check process docker-pidwatch with pidfile /var/run/docker-pidwatch.pid
+	start program = "/usr/bin/systemctl start docker-monit"
+	stop program = "/usr/bin/systemctl stop docker-monit"
+	if 5 restarts with 5 cycles then timeout

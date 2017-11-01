@@ -1,0 +1,11 @@
+[Unit]
+Description=Docker monit
+Requires=docker.service
+After=docker.service
+
+[Service]
+Restart=always
+ExecStart=/usr/local/bin/docker-pidwatch
+
+[Install]
+WantedBy=multi-user.target
