@@ -18,6 +18,7 @@ fi
 
 if [[ -d /etc/systemd/system ]]; then
 	echo "Installing systemd service"
+	systemctl stop docker-pidwatch
 	cp docker-pidwatch.service /etc/systemd/system/
 	systemctl daemon-reload
 	systemctl enable docker-pidwatch
