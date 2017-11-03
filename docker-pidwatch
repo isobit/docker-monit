@@ -12,6 +12,9 @@ echo $$ > /var/run/docker-pidwatch.pid
 log_info() {
 	echo "$(date -Iseconds) [INFO] $1"
 }
+log_debug() {
+	echo "$(date -Iseconds) [DEBUG] $1"
+}
 log_error() {
 	echo "$(date -Iseconds) [ERROR] $1"
 }
@@ -24,14 +27,32 @@ mkdir -p "$RUNDIR"
 cd "$RUNDIR"
 
 while true; do
-	log_info "Updating pid files"
-	for name in $(docker ps -a --format '{{.Names}}'); do
+	log_info "Updating pidfiles"
+
+	containers="$(docker ps --format '{{.Names}}')"
+
+	# Update pidfiles for running containers
+	for name in $containers; do
+		pidfile="${name}.pid"
 		pid="$(docker inspect -f '{{.State.Pid}}' "$name" 2>/dev/null || echo 0)"
 		if [[ "$pid" -ne 0 ]]; then
-			(echo "$pid" > "${name}.pid") || log_error "Failed to create ${RUNDIR}/${name}.pid"
+			if [[ ! -f "$pidfile" || "$(cat "$pidfile")" != "$pid" ]]; then
+				log_debug "Writing ${pid} to ${pidfile}"
+				(echo "$pid" > "$pidfile") || log_error "Failed to create ${pidfile}"
+			fi
 		else
-			rm -f "${name}.pid" || log_error "Failed to remove ${RUNDIR}/${name}.pid"
+			if [[ -f "$pidfile" ]]; then
+				log_debug "Removing ${pidfile}"
+				rm -f "$pidfile" || log_error "Failed to remove ${pidfile}"
+			fi
 		fi
 	done
+
+	# Clean up any pidfiles that don't match a running container
+	for pidfile in $(ls | grep -vf <(echo "$containers" | sed -e 's/^/^/' -e 's/$/.pid$/')); do
+		log_debug "Removing ${pidfile}"
+		rm -f "$pidfile" || log_error "Failed to remove ${pidfile}"
+	done
+
 	sleep 10
 done
