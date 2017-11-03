@@ -16,7 +16,7 @@ log_error() {
 	echo "$(date -Iseconds) [ERROR] $1"
 }
 
-RUNDIR=/var/run/docker-pidwatch/
+RUNDIR=/var/run/docker-pidwatch
 
 log_info "Starting docker-pidwatch"
 
