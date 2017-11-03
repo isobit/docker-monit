@@ -1,5 +1,5 @@
 [Unit]
-Description=Docker monit
+Description=A simple daemon that helps you monitor docker containers by maintaining PID files for them.
 Requires=docker.service
 After=docker.service
 
